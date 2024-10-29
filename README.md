@@ -82,6 +82,7 @@ django example
 import requests
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login
+from django.http import HttpResponseRedirect
 from py_mssso import MSSSOHelper
 
 _LOGIN_FAIL_URL = "/"
