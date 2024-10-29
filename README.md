@@ -62,6 +62,7 @@ django example
 ```
 # view.py
 from py_mssso import MSSSOHelper
+from django.http import HttpResponseRedirect
 
 ...
 
@@ -69,9 +70,10 @@ from py_mssso import MSSSOHelper
 def sso_login(request):
     if not request.session.session_key:
         request.session.create()
-    request.session["msal_flow"] = MSSSOHelper.get().get_auth_code_flow()
+    msal_flow = MSSSOHelper.get().get_auth_code_flow()
+    request.session["msal_flow"] = msal_flow
     request.session.save()
-    return HttpResponseRedirect(request.session["msal_flow"].get("auth_uri"))
+    return HttpResponseRedirect(msal_flow.get("auth_uri"))
 ```
 
 
@@ -169,11 +171,34 @@ def sso_login_callback(request):
         #     or update profile if necessary
         ##############################################
 
+        # parse user object
+        ms_user_obj = res_user.json()
+
+        # set username - it could be "userPrincipalName", "onPremisesSamAccountName" or any other values depending on your settings
+        username = ms_user_obj.get("userPrincipalName")
+        if not username:
+            raise Exception("Invalid User")
+
+        # create or update django user
+        get_user_model().objects.update_or_create(
+            username=username,
+            defaults={
+                "first_name": ms_user_obj.get("givenName"),
+                "last_name": ms_user_obj.get("surname"),
+                "email": ms_user_obj.get("mail"),
+                "is_active": True,
+            },
+        )
+
         # django login
-        # set username with res_user - it can be "userPrincipalName" or "onPremisesSamAccountName" depending on your settings
         _login(request, username)
     except:
         return HttpResponseRedirect(_LOGIN_FAIL_URL)
 
     return HttpResponseRedirect(_LOGIN_SUCCESS_URL)
+```
+
+# sample project
+```
+https://github.com/shineum/py_mssso_sample
 ```
