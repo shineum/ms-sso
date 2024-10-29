@@ -3,7 +3,7 @@
 Use pip:
 
 ```
-pip install py_mssso
+pip install py-mssso
 ```
 or
 
