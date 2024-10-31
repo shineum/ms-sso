@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "py_mssso"
-version = "0.0.1"
+version = "0.0.2"
 description = "MS SSO Helper for Python"
 readme = "README.md"
 authors = [{ name = "Sungwon Um", email = "shineum@gmail.com" }]
