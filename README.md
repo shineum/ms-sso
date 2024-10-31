@@ -119,36 +119,14 @@ def _login(request, username):
 
 # sso callback
 def sso_login_callback(request):
-    code = request.GET.get("code")
-    state = request.GET.get("state")
-    session_state = request.GET.get("session_state")
     msal_flow = request.session.get("msal_flow")
 
     try:
-        # request validation
-        if not code:
-            raise Exception("Invalid request")
-
-        # get token info
-        token_info = MSSSOHelper.get().get_token_info(
+        # get token
+        token = MSSSOHelper.get().get_token(
             auth_code_flow=msal_flow,
-            auth_res={
-                "code": code,
-                "state": state,
-                "session_state": session_state,
-            },
+            auth_res=request.GET,
         )
-
-        # token info validation
-        if not token_info:
-            raise Exception("Invalid request")
-
-        # find token
-        token = token_info.get("access_token")
-
-        # token validation
-        if not token:
-            raise Exception("Invalid request")
 
         # set request header
         headers = {"Authorization": f"Bearer {token}"}
