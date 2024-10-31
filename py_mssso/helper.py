@@ -64,6 +64,12 @@ class _MSALInstance:
             auth_code_flow=auth_code_flow, auth_response=auth_res
         )
 
+    def get_token(self, auth_code_flow, auth_res):
+        try:
+            return self.get_token_info(auth_code_flow, auth_res).get("access_token")
+        except:
+            raise Exception("Invalid request")
+
     def get_accounts(self, username=None):
         return self.get_auth().get_accounts(username)
 
